@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <title>Upload Files</title>
+</head>
+<body>
+    <h1>Upload Files</h1>
+    <form action="{{ url_for('upload_file')}}" method="post" enctype='multipart/form-data'>
+        <input name="file" type="file">
+        <input name='submit' type='submit'>
+    </form>
+</body>
+</html>

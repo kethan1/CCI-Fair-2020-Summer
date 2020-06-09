@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <title>Test - Sign Up</title>
+</head>
+<body>
+    <h1>Sign up</h1>
+    <form action="{{ url_for('sign_up')}}" method="post">
+        <input name='email' type='email' placeholder="Email Address">
+        <br>
+        <br>
+        <input name='username' type='text' placeholder='Username'>
+        <br>
+        <br>
+        <input name='password' type='password' placeholder='Password'>
+        <br>
+        <br>
+        <input name='confirm_password' type='password' placeholder='Confirm Password'>
+        <br>
+        <br>
+        <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+        <br>
+        <br>
+        <input name='submit' type='submit'>
+    </form>
+</body>
+</html>
