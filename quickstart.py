@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 receiver_email = "kethan@vegunta.com"
+sender_email = "cci.throwaway.summer@gmail.com"
 
 message = MIMEMultipart("alternative")
 message["Subject"] = "Password Reset for Kethan's CCI Fair Project 2020 Summer"
@@ -12,12 +13,10 @@ message["From"] = sender_email
 message["To"] = receiver_email
 
 # Create the plain-text and HTML version of your message
-file = open("./templates/forgot_password_error.html", "r")
-html = file.read()
-file.close()
+html = '<p>Hi.</p>'
 
 
-def send_email(html_display, receiver_email, sender_email="cci.throwaway.summer@gmail.com", text="Error. Your email client does not support HTML (Fancier) emails."):
+def send_email(message, html_display, receiver_email, sender_email="cci.throwaway.summer@gmail.com", text="Error. Your email client does not support HTML (Fancier) emails."):
 
     # Add HTML/plain-text parts to MIMEMultipart message
     # The email client will try to render the last part first
@@ -33,4 +32,4 @@ def send_email(html_display, receiver_email, sender_email="cci.throwaway.summer@
         )
 
 
-send_email(html, receiver_email)
+send_email(message, html, receiver_email)

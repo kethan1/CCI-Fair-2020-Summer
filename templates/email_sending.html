@@ -2,24 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Forgot Password</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://www.google.com/recaptcha/api.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Test - Sign Up</title>
 </head>
 <body>
-    <h1 class="text-font center">Sign up</h1>
-    <form class="text-font center" action="{{ url_for('sign_up')}}" method="post">
-        <input class="text-font" name='email' type='email' placeholder="Email Address">
+    <h1 class="text-font center">Forgot Password</h1>
+    <p class="text-font center">Directions: Please Enter Your Email and Username Below. If the username and password belong to the same account, we will email you your password. </p>
+    <form class="text-font center" action="{{ url_for('forgot_password') }}" method="post">
+        <input class="text-font" name="email" type="email" placeholder="Email">
         <br>
-        <br>
-        <input class="text-font" name='username' type='text' placeholder='Username'>
-        <br>
-        <br>
-        <input class="text-font" name='password' type='password' placeholder='Password'>
-        <br>
-        <br>
-        <input class="text-font" name='confirm_password' type='password' placeholder='Confirm Password'>
+        <input class="text-font" name="username" type="text" placeholder="Username">
         <br>
         <br>
         {% if red %}
@@ -32,8 +26,7 @@
             </div>
         {% endif %}
         <br>
-        <br>
-        <input class="text-font" name='submit' type='submit'>
+        <input class="text-font" name="submit" type="submit">
     </form>
     <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
         <button class="text-font" type="submit">Login</button>

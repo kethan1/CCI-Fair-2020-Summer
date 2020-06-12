@@ -3,22 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <title>Test - Login</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <form action="{{ url_for('login')}}" method="post">
-        <input name='username' type='text' placeholder='Username'>
+    <h1 class="text-font center">Login</h1>
+    <form class="text-font center" action="{{ url_for('login')}}" method="post">
+        <input class="text-font" name='username' type='text' placeholder='Username'>
         <br>
         <br>
-        <input name='password' type='password' placeholder='Password'>
+        <input class="text-font" name='password' type='password' placeholder='Password'>
         <br>
         <br>
-        <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+        {% if red %}
+            <div style="margin:0 auto;width:304px;border:2px solid red">
+                <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+            </div>
+        {% else %}
+            <div style="margin:0 auto;width: 304px;">
+                <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+            </div>
+        {% endif %}
+        <br>
+        <a style="font-size:1vw" href = '{{ url_for('forgot_password') }}'>Forgot Password</a>
         <br>
         <br>
-        <input name='submit' type='submit'>
+        <input class="text-font" name='submit' type='submit'>
+    </form>
+    <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
+        <button class="text-font" type="submit">Login</button>
+    </form>
+    <form style="top:0.5vw;right:5vw;position:absolute;" action=" {{ url_for('sign_up') }} ">
+        <button class="text-font" type="submit">Sign Up</button>
+    </form>
+    <form style="top:0.5vw;right:10.5vw;position:absolute;" action=" {{ url_for('sign_out') }} ">
+        <button class="text-font" type="submit">Sign Out</button>
+    </form>
+    <form style="top:0.5vw;right:16.5vw;position:absolute;" action=" {{ url_for('upload_file') }} ">
+        <button class="text-font" type="submit">Upload File</button>
+    </form>
+    <form style="top:0.5vw;right:23.7vw;position:absolute;" action=" {{ url_for('home') }} ">
+        <button class="text-font" type="submit">Home</button>
     </form>
 </body>
 </html>

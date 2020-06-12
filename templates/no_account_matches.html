@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <title>No Account Matches</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <title>Test - Error</title>
 </head>
 <body>
-    <h1 class="text-font center">Username Does Not Exist</h1>
-    <div class="center">
-        <a class="text-font" href="{{ url_for('sign_up') }}">Click Here to go to Sign Up</a>
-    </div>
+    <h1 class="text-font center">No Account Has the Same Email and Username</h1>
+    <p class="text-font center">Please create a new account, or enter your information again. </p>
     <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
         <button class="text-font" type="submit">Login</button>
     </form>
