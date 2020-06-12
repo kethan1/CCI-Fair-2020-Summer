@@ -8,7 +8,7 @@
 <body>
     <h1 style="text-align:center">Home</h1>
     <p style="text-align:center">Hi. This is the home page for my showcase for the CCI Fair. </p>
-    <p>User Logged In: {{ logged_in[0] }}</p>
+    <p style="top:0;left:2;position:fixed;">Logged In: {{ logged_in[0] }}</p>
     <br>
     <form action=" {{ url_for('sign_out') }} ">
         <button type="submit">Sign Out</button>
@@ -16,7 +16,11 @@
     <form action=" {{ url_for('upload_file') }} ">
         <button type="submit">Upload File</button>
     </form>
-    <a href="{{ url_for('sign_up') }}">Sign up</a>
-    <a href="{{ url_for('login') }}">Login</a>
+    <form action=" {{ url_for('sign_up') }} ">
+        <button type="submit">Sign Up</button>
+    </form>
+    <form action=" {{ url_for('login') }} ">
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>

@@ -10,6 +10,7 @@ from email.mime.multipart import MIMEMultipart
 import ssl
 import smtplib
 import os
+from cryptography.fernet import Fernet
 
 
 def str2num(string):
@@ -31,7 +32,7 @@ receiver_email = "kethan@vegunta.com"
 def initialize_database():
     Database.initialize()
     print(Database.get("users"))
-    # Database.delete_docs("users")
+    Database.delete_docs("users")
 
 
 user_logged_in = None
@@ -73,7 +74,13 @@ def login():
     if request.method == 'GET':
         return render_template("login.html")
     elif request.method == 'POST':
-        t = [{'username': num2str(each['username']), 'password': num2str(each['password']), 'email': each['email']} for
+        file = open('key.key', 'rb')
+        key = file.read()  # The key will be type bytes
+        file.close()
+
+        f = Fernet(key)
+
+        t = [{'username': (f.decrypt(each['username'])).decode(), 'password': (f.decrypt(each['password'])).decode(), 'email': each['email']} for
              each in Database.get("users")]
         username = request.form.get("username")
         password = request.form.get("password")
@@ -97,24 +104,31 @@ def sign_up():
     if request.method == 'GET':
         return render_template("sign_up.html")
     elif request.method == 'POST':
+
+        file = open('key.key', 'rb')
+        key = file.read()  # The key will be type bytes
+        file.close()
+
+        f = Fernet(key)
+
         if is_human(request.form['g-recaptcha-response']):
 
-            t = {key2: value2 for each in Database.get("users") for key2, value2 in each.items() if key2 != '_id'}
+            t = {((f.decrypt(key2)).decode()): ((f.decrypt(value2)).decode()) for each in Database.get("users") for key2, value2 in each.items() if key2 != '_id'}
             print(t)
-            username = str2num(request.form.get('username'))
-            password = str2num(request.form.get('password'))
-            confirm_password = str2num(request.form.get('confirm_password'))
+            username = request.form.get('username')
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirm_password')
             email = request.form.get('email')
 
-            if username not in t.keys():
+            if username not in [each['users'] for each in t]:
                 if password == confirm_password:
-                    Database.insert_record({'username': username, 'password': password, 'email': email}, "users")
-                    user_logged_in = [num2str(username), password]
+                    Database.insert_record({'username': f.encrypt((username.encode())), 'password': f.encrypt((password.encode())), 'email': email}, "users")
+                    user_logged_in = [username, password]
                     try:
                         os.mkdir(os.path.join('./files', num2str(username)))
                     except:
                         pass
-                    app.config['UPLOAD_FOLDER'] = os.path.join('./files/', num2str(username))
+                    app.config['UPLOAD_FOLDER'] = os.path.join('./files/', username)
                     return render_static("success_sign_up.html")
                 else:
                     return render_static("password_not_match_confirm_password.html")
@@ -126,7 +140,7 @@ def sign_up():
 
 @app.route('/remove_file', methods=['GET', 'POST'])
 def remove_file():
-    file_name=request.form['DeleteButton']
+    file_name = request.form['DeleteButton']
     if user_logged_in is not None:
         print('removing file...')
         os.remove(os.path.join('./files', user_logged_in[0], file_name))
