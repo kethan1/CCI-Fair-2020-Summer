@@ -11,5 +11,20 @@
         <input name="file" type="file">
         <input name='submit' type='submit'>
     </form>
+    <br>
+    <table>
+        {% for file_name in files %}
+            <tr>
+                <td>{{ file_name }}</td>
+                <td>
+                    <form action="{{ url_for('remove_file', file_name=file_name) }}" method="post">
+                        <button name="DeleteButton" type="submit" value="{{ file_name }}">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>No Files Uploaded Yet</tr>
+        {% endfor %}
+    </table>
 </body>
 </html>

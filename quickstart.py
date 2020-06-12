@@ -1,9 +1,9 @@
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import ssl, smtplib
 import os
+import smtplib
+import ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
-sender_email = "cci.throwaway.summer@gmail.com"
 receiver_email = "kethan@vegunta.com"
 
 message = MIMEMultipart("alternative")
@@ -12,18 +12,17 @@ message["From"] = sender_email
 message["To"] = receiver_email
 
 # Create the plain-text and HTML version of your message
-text = """\
-"""
 file = open("./templates/forgot_password_error.html", "r")
 html = file.read()
 file.close()
 
-def send_email(html, receiver_email, sender_email="cci.throwaway.summer@gmail.com", text="Error. Your email client does not support HTML (Fancier) emails."):
+
+def send_email(html_display, receiver_email, sender_email="cci.throwaway.summer@gmail.com", text="Error. Your email client does not support HTML (Fancier) emails."):
 
     # Add HTML/plain-text parts to MIMEMultipart message
     # The email client will try to render the last part first
     message.attach(MIMEText(text, "plain"))
-    message.attach(MIMEText(html, "html"))
+    message.attach(MIMEText(html_display, "html"))
 
     # Create secure connection with server and send email
     context = ssl.create_default_context()
@@ -32,5 +31,6 @@ def send_email(html, receiver_email, sender_email="cci.throwaway.summer@gmail.co
         server.sendmail(
             sender_email, receiver_email, message.as_string()
         )
+
 
 send_email(html, receiver_email)
