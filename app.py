@@ -133,7 +133,7 @@ def sign_up():
                     Database.insert_record({'username': f.encrypt((username.encode())), 'password': f.encrypt((password.encode())), 'email': email.lower()}, "users")
                     user_logged_in = [username, password]
                     try:
-                        os.mkdir(os.path.join('./files', num2str(username)))
+                        os.mkdir(os.path.join('./files', username))
                     except:
                         pass
                     app.config['UPLOAD_FOLDER'] = os.path.join('./files/', username)
