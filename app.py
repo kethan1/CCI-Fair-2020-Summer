@@ -39,7 +39,7 @@ receiver_email = "kethan@vegunta.com"
 @app.before_first_request
 def initialize_database():
     Database.initialize()
-    print(Database.get("users"))
+    # print(Database.get("users"))
     # Database.delete_docs("users")
 
 
@@ -65,7 +65,8 @@ def home():
 
 @app.route("/<string:page_name>/")
 def render_static(page_name):
-    return render_template('%s' % page_name)
+    global user_logged_in
+    return render_template('%s' % page_name, logged_in=user_logged_in)
 
 
 @app.route("/sign_out")
@@ -80,7 +81,7 @@ def sign_out():
 def login():
     global user_logged_in
     if request.method == 'GET':
-        return render_template("login.html", red = False)
+        return render_template("login.html", red=False, logged_in=user_logged_in, error='')
     elif request.method == 'POST':
         file = open('key.key', 'rb')
         key = file.read()  # The key will be type bytes
@@ -99,18 +100,18 @@ def login():
                     app.config['UPLOAD_FOLDER'] = os.path.join('./files/', user_logged_in[0])
                     return render_static("success_login.html")
                 else:
-                    return render_static("incorrect_password.html")
+                    return render_template("login.html", red=False, logged_in=user_logged_in, error='Incorrect Password')
             else:
-                return render_static("username_does_not_exist.html")
+                return render_template("login.html", red=False, logged_in=user_logged_in, error='Username Does Not Exist')
         else:
-            return render_template("login.html", red = True)
+            return render_template("login.html", logged_in=user_logged_in, red=True, error='')
 
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
     global user_logged_in
     if request.method == 'GET':
-        return render_template("sign_up.html", red = False)
+        return render_template("sign_up.html", red=False, logged_in=user_logged_in, error='')
     elif request.method == 'POST':
 
         file = open('key.key', 'rb')
@@ -122,7 +123,7 @@ def sign_up():
         if is_human(request.form['g-recaptcha-response']):
 
             t = [{'users': ((f.decrypt(each['username'])).decode()), 'password':((f.decrypt(each['password'])).decode())} for each in Database.get("users")]
-            print(t)
+
             username = request.form.get('username')
             password = request.form.get('password')
             confirm_password = request.form.get('confirm_password')
@@ -139,16 +140,18 @@ def sign_up():
                     app.config['UPLOAD_FOLDER'] = os.path.join('./files/', username)
                     return render_static("success_sign_up.html")
                 else:
-                    return render_static("password_not_match_confirm_password.html")
+                    return render_template("sign_up.html", red=False, logged_in=user_logged_in, error='Password Does Not Match Confirm Password')
             else:
-                return render_static("username_already_exists.html")
+                return render_template("sign_up.html", red=False, logged_in=user_logged_in, error='Username Already Exists')
         else:
-            return render_template("sign_up.html", red=True)
+            return render_template("sign_up.html", red=True, error='')
+
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
+    global user_logged_in
     if request.method == 'GET':
-        return render_template('email_sending.html', red=False)
+        return render_template('email_sending.html', red=False, logged_in=user_logged_in)
     elif request.method == 'POST':
         if is_human(request.form['g-recaptcha-response']):
             username = request.form.get('username')
@@ -183,53 +186,49 @@ def forgot_password():
                         </p>
                       </body>
                     </html>
-                    """ %(username, each[2])
+                    """ % (username, each[2])
 
                     send_email(message, html, receiver_email)
 
-                    return render_template('email_sent.html')
+                    return render_template('email_sent.html', logged_in=user_logged_in)
                 else:
-                    return render_template('no_account_matches.html')
+                    return render_template('no_account_matches.html', logged_in=user_logged_in)
         else:
-            return render_template('email_sending.html', red=True)
-
+            return render_template('email_sending.html', red=True, logged_in=user_logged_in)
 
 
 @app.route('/remove_file', methods=['GET', 'POST'])
 def remove_file():
+    global user_logged_in
     try:
         file_name = request.form['DeleteButton']
+        if user_logged_in is not None:
+            os.remove(os.path.join('./files', user_logged_in[0], file_name))
+            path = os.path.join('./files', user_logged_in[0])
+            files = os.listdir(path)
+            return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
     except:
         pass
-    if user_logged_in is not None:
-        try:
-            os.remove(os.path.join('./files', user_logged_in[0], file_name))
-        except FileNotFoundError:
-            pass
-        path = os.path.join('./files', user_logged_in[0])
-        files = os.listdir(path)
-        return render_template("upload_files.html", files=files, path=path)
 
 
 @app.route('/upload_file', methods=['GET', 'POST'])
 def upload_file():
+    global user_logged_in
     if request.method == 'GET':
         if user_logged_in is None:
             return render_static("please_login_in.html")
         else:
             path = os.path.join('./files', user_logged_in[0])
             files = os.listdir(path)
-            return render_template("upload_files.html", files=files, path=path)
+            return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
     elif request.method == 'POST':
         file = request.files['file']
         filename = secure_filename(file.filename)
-        print(app.config['UPLOAD_FOLDER'], filename)
-        print(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         if user_logged_in is not None:
             path = os.path.join('./files', user_logged_in[0])
             files = os.listdir(path)
-            return render_template("upload_files.html", files=files, path=path)
+            return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
         else:
             return render_static("please_login_in.html")
 

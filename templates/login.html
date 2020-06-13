@@ -26,25 +26,44 @@
             </div>
         {% endif %}
         <br>
-        <a style="font-size:1vw" href = '{{ url_for('forgot_password') }}'>Forgot Password</a>
+        <a style="font-size:1vw" href = "{{ url_for('forgot_password') }}">Forgot Password</a>
         <br>
         <br>
         <input class="text-font" name='submit' type='submit'>
     </form>
     <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
-        <button class="text-font" type="submit">Login</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Login</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Login</button>
+        {% endif %}
+
     </form>
     <form style="top:0.5vw;right:5vw;position:absolute;" action=" {{ url_for('sign_up') }} ">
-        <button class="text-font" type="submit">Sign Up</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Sign Up</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Sign Up</button>
+        {% endif %}
     </form>
     <form style="top:0.5vw;right:10.5vw;position:absolute;" action=" {{ url_for('sign_out') }} ">
-        <button class="text-font" type="submit">Sign Out</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Sign Out</button>
+        {% else %}
+            <button class="text-font" type="submit">Sign Out</button>
+        {% endif %}
+
     </form>
     <form style="top:0.5vw;right:16.5vw;position:absolute;" action=" {{ url_for('upload_file') }} ">
-        <button class="text-font" type="submit">Upload File</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Upload File</button>
+        {% else %}
+            <button class="text-font" type="submit">Upload File</button>
+        {% endif %}
     </form>
     <form style="top:0.5vw;right:23.7vw;position:absolute;" action=" {{ url_for('home') }} ">
         <button class="text-font" type="submit">Home</button>
     </form>
+    <p style="font-size:1.75vw;color:red;" class="text-font center">{{ error }}</p>
 </body>
 </html>

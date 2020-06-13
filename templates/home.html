@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Test - Home</title>
+    <title>Home</title>
+    <style>
+        body {
+          background-image: url({{ url_for('static', filename='images/background.jpg') }});
+        }
+    </style>
 </head>
 <body>
     <h1 class="text-font center">Home</h1>
@@ -12,16 +17,34 @@
     <p style="top:0;left:2;position:fixed;" class="text-font">Logged In: {{ logged_in[0] }}</p>
     <br>
     <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
-        <button class="text-font" type="submit">Login</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Login</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Login</button>
+        {% endif %}
+
     </form>
     <form style="top:0.5vw;right:5vw;position:absolute;" action=" {{ url_for('sign_up') }} ">
-        <button class="text-font" type="submit">Sign Up</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Sign Up</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Sign Up</button>
+        {% endif %}
     </form>
     <form style="top:0.5vw;right:10.5vw;position:absolute;" action=" {{ url_for('sign_out') }} ">
-        <button class="text-font" type="submit">Sign Out</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Sign Out</button>
+        {% else %}
+            <button class="text-font" type="submit">Sign Out</button>
+        {% endif %}
+
     </form>
     <form style="top:0.5vw;right:16.5vw;position:absolute;" action=" {{ url_for('upload_file') }} ">
-        <button class="text-font" type="submit">Upload File</button>
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Upload File</button>
+        {% else %}
+            <button class="text-font" type="submit">Upload File</button>
+        {% endif %}
     </form>
     <form style="top:0.5vw;right:23.7vw;position:absolute;" action=" {{ url_for('home') }} ">
         <button class="text-font" type="submit">Home</button>
