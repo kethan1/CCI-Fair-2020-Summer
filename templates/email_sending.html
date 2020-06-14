@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <script src="https://www.google.com/recaptcha/api.js"></script>
+    <style>
+        body {
+          background-image: url({{ url_for('static', filename='images/background.jpg') }});
+        }
+    </style>
 </head>
 <body>
     <h1 class="text-font center">Forgot Password</h1>

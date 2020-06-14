@@ -6,6 +6,11 @@
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Test - Sign Up</title>
+    <style>
+        body {
+          background-image: url({{ url_for('static', filename='images/background.jpg') }});
+        }
+    </style>
 </head>
 <body>
     <h1 class="text-font center">Sign up</h1>

@@ -1,8 +1,6 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 import requests
 import json
-import os
-import binascii
 from werkzeug.utils import secure_filename
 from database import Database
 from email.mime.text import MIMEText
@@ -144,7 +142,7 @@ def sign_up():
             else:
                 return render_template("sign_up.html", red=False, logged_in=user_logged_in, error='Username Already Exists')
         else:
-            return render_template("sign_up.html", red=True, error='')
+            return render_template("sign_up.html", red=True, error='', logged_in=user_logged_in)
 
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
@@ -197,18 +195,29 @@ def forgot_password():
             return render_template('email_sending.html', red=True, logged_in=user_logged_in)
 
 
+@app.route('/download_file', methods=['GET', 'POST'])
+def download_file():
+    global user_logged_in
+    try:
+        file_name = request.form['UploadButton']
+        return send_from_directory(app.config['UPLOAD_FOLDER'], file_name, as_attachment=True)
+    except:
+        pass
+
+
 @app.route('/remove_file', methods=['GET', 'POST'])
 def remove_file():
     global user_logged_in
     try:
-        file_name = request.form['DeleteButton']
-        if user_logged_in is not None:
-            os.remove(os.path.join('./files', user_logged_in[0], file_name))
-            path = os.path.join('./files', user_logged_in[0])
-            files = os.listdir(path)
-            return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
+        file_name = request.form.get('DeleteButton')
+        os.remove(os.path.join('./files', user_logged_in[0], file_name))
+        path = os.path.join('./files', user_logged_in[0])
+        files = os.listdir(path)
+        return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
     except:
-        pass
+        path = os.path.join('./files', user_logged_in[0])
+        files = os.listdir(path)
+        return render_template("upload_files.html", files=files, path=path, logged_in=user_logged_in)
 
 
 @app.route('/upload_file', methods=['GET', 'POST'])
@@ -234,4 +243,5 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print('http://192.168.0.19:5000')
+    app.run(host='0.0.0.0')

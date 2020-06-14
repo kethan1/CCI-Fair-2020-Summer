@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <title>Test</title>
+    <style>
+        body {
+          background-image: url({{ url_for('static', filename='images/background.jpg') }});
+        }
+    </style>
 </head>
 <body>
     <h2 class="text-font center">Please Login or Sign Up to Continue</h2>
