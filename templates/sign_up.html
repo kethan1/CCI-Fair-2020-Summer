@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Test - Sign Up</title>
+    <style>
+        body {
+          background-image: url({{ url_for('static', filename='images/background.jpg') }});
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-font center">Sign up</h1>
+    <form class="text-font center" action="{{ url_for('sign_up')}}" method="post">
+        <input class="text-font" name='email' type='email' placeholder="Email Address">
+        <br>
+        <br>
+        <input class="text-font" name='username' type='text' placeholder='Username'>
+        <br>
+        <br>
+        <input class="text-font" name='password' type='password' placeholder='Password'>
+        <br>
+        <br>
+        <input class="text-font" name='confirm_password' type='password' placeholder='Confirm Password'>
+        <br>
+        <br>
+        {% if red %}
+            <div style="margin:0 auto;width:304px;border:2px solid red">
+                <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+            </div>
+        {% else %}
+            <div style="margin:0 auto;width: 304px;">
+                <div class="g-recaptcha" data-sitekey="6LcE3PsUAAAAAKtGOw_I-Ft1ZsXe9wgkwtEHBOGV"></div>
+            </div>
+        {% endif %}
+        <br>
+        <br>
+        <input class="text-font" name='submit' type='submit'>
+    </form>
+    <form style="top:0.5vw;right:0.5vw;position:absolute;" action=" {{ url_for('login') }} ">
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Login</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Login</button>
+        {% endif %}
+
+    </form>
+    <form style="top:0.5vw;right:5vw;position:absolute;" action=" {{ url_for('sign_up') }} ">
+        {% if logged_in == None %}
+            <button class="text-font" type="submit">Sign Up</button>
+        {% else %}
+            <button class="text-font" type="submit" disabled>Sign Up</button>
+        {% endif %}
+    </form>
+    <form style="top:0.5vw;right:10.5vw;position:absolute;" action=" {{ url_for('sign_out') }} ">
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Sign Out</button>
+        {% else %}
+            <button class="text-font" type="submit">Sign Out</button>
+        {% endif %}
+
+    </form>
+    <form style="top:0.5vw;right:16.5vw;position:absolute;" action=" {{ url_for('upload_file') }} ">
+        {% if logged_in == None %}
+            <button class="text-font" type="submit" disabled>Upload File</button>
+        {% else %}
+            <button class="text-font" type="submit">Upload File</button>
+        {% endif %}
+    </form>
+    <form style="top:0.5vw;right:23.7vw;position:absolute;" action=" {{ url_for('home') }} ">
+        <button class="text-font" type="submit">Home</button>
+    </form>
+    <p style="font-size:1.75vw;color:red;" class="text-font center">{{ error }}</p>
+</body>
+</html>

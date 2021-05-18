@@ -1,0 +1,6 @@
+Flask
+pymongo
+requests
+httplib2
+werkzeug
+cryptography
