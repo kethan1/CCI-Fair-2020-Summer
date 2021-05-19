@@ -1,17 +1,19 @@
-from flask import *
-import requests
 import json
+import os
+import requests
+
+from flask import *
 from werkzeug.utils import secure_filename
-from database import Database
+from cryptography.fernet import Fernet
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import ssl
 import smtplib
-import os
-from cryptography.fernet import Fernet
+import ssl
+
+from database import Database
 
 
-def send_email(message, html_display, receiver_email, sender_email="cci.throwaway.summer@gmail.com", text="Error. Your email client does not support HTML (Fancier) emails."):
+def send_email(message, html_display, receiver_email, sender_email, sender_password, text="Error. Your email client does not support HTML (Fancier) emails."):
 
     # Add HTML/plain-text parts to MIMEMultipart message
     # The email client will try to render the last part first
@@ -21,26 +23,23 @@ def send_email(message, html_display, receiver_email, sender_email="cci.throwawa
     # Create secure connection with server and send email
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
-        server.login(sender_email, os.environ.get('Password'))
+        server.login(sender_email, sender_password)
         server.sendmail(
             sender_email, receiver_email, message.as_string()
         )
 
+with open("api_keys.json") as api_keys_file:
+    api_keys = json.load(api_keys_file)
 
 app = Flask(__name__)
 
-app.config["UPLOAD_FOLDER"] = "C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files"
-app.secret_key = b'\xb7\xd3<\x83\xadA\xae\xdb\xee!\xb9_\xc6\xbc\x8d6\xa6(<\x06\x94MU\xfc\xfc\n%O\xcc\xa2\xde\x9fyp\xb0\xa7i]\x10\xb6*\xc8\x103j\xd5\xedK]8\xe1 \x1eA\xf60f\xbb\xda^z(\x14\x96V'
-
-receiver_email = "kethan@vegunta.com"
+app.config["UPLOAD_FOLDER"] = "files/"
+app.secret_key = api_keys["SECRET_KEY"]
 
 
 @app.before_first_request
 def initialize_database():
     Database.initialize()
-    # print(Database.get("users"))
-    # Database.delete_docs("users")
-
 
 def is_human(captcha_response):
     """ Validating recaptcha response from google server
@@ -74,7 +73,7 @@ def render_static(page_name):
 @app.route("/sign_out")
 def sign_out():
     session['logged_in'] = None
-    app.config['UPLOAD_FOLDER'] = 'C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files'
+    app.config['UPLOAD_FOLDER'] = '/files'
     return redirect(url_for('home'))
 
 
@@ -87,7 +86,7 @@ def login():
     if request.method == 'GET':
         return render_template("login.html", red=False, logged_in=logged_in, error='')
     elif request.method == 'POST':
-        file = open('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/key.key', 'rb')
+        file = open('key.key', 'rb')
         key = file.read()  # The key will be type bytes
         file.close()
 
@@ -101,7 +100,7 @@ def login():
             if username in [each['username'] for each in t]:
                 if password == [each['password'] for each in t if username == each['username']][0]:
                     session['logged_in'] = [username, password]
-                    app.config['UPLOAD_FOLDER'] = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', session['logged_in'][0])
+                    app.config['UPLOAD_FOLDER'] = os.path.join('files/', session['logged_in'][0])
                     return render_static("success_login.html")
                 else:
                     return render_template("login.html", red=False, logged_in=logged_in, error='Incorrect Password')
@@ -121,7 +120,7 @@ def sign_up():
         return render_template("sign_up.html", red=False, logged_in=logged_in, error='')
     elif request.method == 'POST':
 
-        file = open('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/key.key', 'rb')
+        file = open('key.key', 'rb')
         key = file.read()  # The key will be type bytes
         file.close()
 
@@ -141,10 +140,10 @@ def sign_up():
                     Database.insert_record({'username': f.encrypt((username.encode())), 'password': f.encrypt((password.encode())), 'email': email.lower()}, "users")
                     session['logged_in'] = [username, password]
                     try:
-                        os.mkdir(os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', username))
+                        os.mkdir(os.path.join('files/', username))
                     except Exception as e:
                         print(e)
-                    app.config['UPLOAD_FOLDER'] = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files/', username)
+                    app.config['UPLOAD_FOLDER'] = os.path.join('files/', username)
                     return render_static("success_sign_up.html")
                 else:
                     return render_template("sign_up.html", red=False, logged_in=logged_in, error='Password Does Not Match Confirm Password')
@@ -167,7 +166,7 @@ def forgot_password():
             username = request.form.get('username')
             email = request.form.get('email')
 
-            file = open('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/key.key', 'rb')
+            file = open('key.key', 'rb')
             key = file.read()  # The key will be type bytes
             file.close()
 
@@ -202,7 +201,7 @@ def forgot_password():
                         </html>
                         """ % (username, each[2])
 
-                        send_email(message, html, receiver_email)
+                        send_email(message, html, email, api_keys["EMAIL"], api_keys["EMAIL_PASSWORD"])
 
                         return render_template('email_sent.html', logged_in=logged_in)
         else:
@@ -232,12 +231,12 @@ def remove_file():
         logged_in = None
     try:
         file_name = request.form.get('DeleteButton')
-        os.remove(os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', logged_in[0], file_name))
-        path = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', logged_in[0])
+        os.remove(os.path.join('files/', logged_in[0], file_name))
+        path = os.path.join('files/', logged_in[0])
         files = os.listdir(path)
         return render_template("upload_files.html", files=files, path=path, logged_in=logged_in)
     except:
-        path = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', logged_in[0])
+        path = os.path.join('files/', logged_in[0])
         files = os.listdir(path)
         return render_template("upload_files.html", files=files, path=path, logged_in=logged_in)
 
@@ -252,7 +251,7 @@ def upload_file():
         if logged_in is None:
             return render_static("please_login_in.html")
         else:
-            path = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', logged_in[0])
+            path = os.path.join('files/', logged_in[0])
             files = os.listdir(path)
             return render_template("upload_files.html", files=files, path=path, logged_in=logged_in)
     elif request.method == 'POST':
@@ -260,7 +259,7 @@ def upload_file():
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         if logged_in is not None:
-            path = os.path.join('C:/Users/ketha/Documents/Kethan/Youngwonks/CCI Fairs/CCI Fair 7-25-2020/files', logged_in[0])
+            path = os.path.join('files/', logged_in[0])
             files = os.listdir(path)
             return render_template("upload_files.html", files=files, path=path, logged_in=logged_in)
         else:
@@ -268,5 +267,5 @@ def upload_file():
 
 
 if __name__ == '__main__':
-    print('http://192.168.0.19:5000')
-    app.run(host='0.0.0.0', debug=True)
+    # print('http://192.168.0.19:5000')
+    app.run(debug=True)
